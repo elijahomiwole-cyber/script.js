@@ -9,29 +9,32 @@ function updateDashboard() {
 
     const pendingCount = pickups.filter(p => p.status !== "completed").length;
 
-    document.getElementById("totalPickups").textContent = total;
-    document.getElementById("todayPickups").textContent = todayCount;
-    document.getElementById("completedPickups").textContent = completedCount;
-    document.getElementById("pendingPickups").textContent = pendingCount;
+    const totalElement = document.getElementById("totalPickups");
+    const todayElement = document.getElementById("todayPickups");
+    const completedElement = document.getElementById("completedPickups");
+    const pendingElement = document.getElementById("pendingPickups");
+
+    if (totalElement) totalElement.textContent = total;
+    if (todayElement) todayElement.textContent = todayCount;
+    if (completedElement) completedElement.textContent = completedCount;
+    if (pendingElement) pendingElement.textContent = pendingCount;
 }
 
 displayPickups();
 displayFeedback();
 updateDashboard();
+
 const searchInput = document.getElementById("search");
 
-searchInput.addEventListener("keyup", function () {
-    const searchText = this.value.toLowerCase();
+if (searchInput) {
+    searchInput.addEventListener("keyup", function () {
+        const searchText = this.value.toLowerCase();
 
-    const cards = document.querySelectorAll("#pickupList .card");
+        const cards = document.querySelectorAll("#pickupList .card");
 
-    cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-
-        if (text.includes(searchText)) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(searchText) ? "block" : "none";
+        });
     });
-});
+}
