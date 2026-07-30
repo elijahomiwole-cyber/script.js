@@ -1,4 +1,3 @@
-# script.js
 function updateDashboard() {
     const total = pickups.length;
 
@@ -15,5 +14,7 @@ function updateDashboard() {
     document.getElementById("completedPickups").textContent = completedCount;
     document.getElementById("pendingPickups").textContent = pendingCount;
 }
+
 displayPickups();
 displayFeedback();
+updateDashboard();
