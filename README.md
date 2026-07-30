@@ -18,3 +18,20 @@ function updateDashboard() {
 displayPickups();
 displayFeedback();
 updateDashboard();
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("keyup", function () {
+    const searchText = this.value.toLowerCase();
+
+    const cards = document.querySelectorAll("#pickupList .card");
+
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+
+        if (text.includes(searchText)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
+});
