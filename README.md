@@ -1,40 +1,276 @@
-function updateDashboard() {
-    const total = pickups.length;
+// ===============================
+// Waste Pickup Scheduler
+// Part 1 - Data & Pickup Handling
+// ===============================
+
+// Load pickups from Local Storage
+let pickups = JSON.parse(localStorage.getItem("pickups")) || [];
+
+// Load feedback from Local Storage
+let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+// Save pickups
+function savePickups() {
+    localStorage.setItem("pickups", JSON.stringify(pickups));
+}
+
+// Save feedback
+function saveFeedbackData() {
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+}
+
+// Pickup Form
+const pickupForm = document.getElementById("pickupForm");
+
+if (pickupForm) {
+    pickupForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const pickup = {
+            id: Date.now(),
+            name: document.getElementById("name").value,
+            phone: document.getElementById("phone").value,
+            address: document.getElementById("address").value,
+            wasteType: document.getElementById("wasteType").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value,
+            status: "pending"
+        };
+
+        pickups.push(pickup);
+
+        savePickups();
+
+        displayPickups();
+
+        updateDashboard();
+
+        alert("Pickup scheduled successfully!");
+
+        pickupForm.reset();
+    });
+}
+
+// Display Pickups
+function displayPickups() {
+
+    const pickupList = document.getElementById("pickupList");
+
+    if (!pickupList) return;
+
+    pickupList.innerHTML = "";
+
+    pickups.forEach((pickup) => {
+
+        pickupList.innerHTML += `
+            <div class="card">
+
+                <h3>${pickup.name}</h3>
+
+                <p><strong>Phone:</strong> ${pickup.phone}</p>
+
+                <p><strong>Address:</strong> ${pickup.address}</p>
+
+                <p><strong>Waste:</strong> ${pickup.wasteType}</p>
+
+                <p><strong>Date:</strong> ${pickup.date}</p>
+
+                <p><strong>Time:</strong> ${pickup.time}</p>
+
+                <p><strong>Status:</strong> ${pickup.status}</p>
+
+                <button onclick="completePickup(${pickup.id})">
+                    Complete
+                </button>
+
+                <button onclick="deletePickup(${pickup.id})">
+                    Delete
+                </button>
+
+            </div>
+        `;
+    });
+}
+// ===============================
+// Waste Pickup Scheduler
+// Part 1 - Data & Pickup Handling
+// ===============================
+
+// Load pickups from Local Storage
+let pickups = JSON.parse(localStorage.getItem("pickups")) || [];
+
+// Load feedback from Local Storage
+let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+// Save pickups
+function savePickups() {
+    localStorage.setItem("pickups", JSON.stringify(pickups));
+}
+
+// Save feedback
+function saveFeedbackData() {
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+}
+
+// Pickup Form
+const pickupForm = document.getElementById("pickupForm");
+
+if (pickupForm) {
+    pickupForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+
+        const pickup = {
+            id: Date.now(),
+            name: document.getElementById("name").value,
+            phone: document.getElementById("phone").value,
+            address: document.getElementById("address").value,
+            wasteType: document.getElementById("wasteType").value,
+            date: document.getElementById("date").value,
+            time: document.getElementById("time").value,
+            status: "pending"
+        };
+
+        pickups.push(pickup);
+
+        savePickups();
+
+        displayPickups();
+
+        updateDashboard();
+
+        alert("Pickup scheduled successfully!");
+
+        pickupForm.reset();
+    });
+}
+
+// Display Pickups
+function displayPickups() {
+
+    const pickupList = document.getElementById("pickupList");
+
+    if (!pickupList) return;
+
+    pickupList.innerHTML = "";
+
+    pickups.forEach((pickup) => {
+
+        pickupList.innerHTML += `
+            <div class="card">
+
+                <h3>${pickup.name}</h3>
+
+                <p><strong>Phone:</strong> ${pickup.phone}</p>
+
+                <p><strong>Address:</strong> ${pickup.address}</p>
+
+                <p><strong>Waste:</strong> ${pickup.wasteType}</p>
+
+                <p><strong>Date:</strong> ${pickup.date}</p>
+
+                <p><strong>Time:</strong> ${pickup.time}</p>
+
+                <p><strong>Status:</strong> ${pickup.status}</p>
+
+                <button onclick="completePickup(${pickup.id})">
+                    Complete
+                </button>
+
+                <button onclick="deletePickup(${pickup.id})">
+                    Delete
+                </button>
+
+            </div>
+        `;
+    });
+}
+// ===============================
+// Part 3 - Feedback & Initialization
+// ===============================
+
+// Save Feedback
+function saveFeedback() {
+
+    const name = document.getElementById("feedbackName").value;
+    const rating = document.getElementById("rating").value;
+    const comment = document.getElementById("comment").value;
+
+    if (!name || !rating || !comment) {
+        alert("Please complete all feedback fields.");
+        return;
+    }
+
+    feedbacks.push({
+        name,
+        rating,
+        comment,
+        date: new Date().toLocaleString()
+    });
+
+    saveFeedbackData();
+
+    displayFeedback();
+
+    document.getElementById("feedbackName").value = "";
+    document.getElementById("rating").value = "";
+    document.getElementById("comment").value = "";
+
+    alert("Thank you for your feedback!");
+}
+
+// Display Feedback
+function displayFeedback() {
+
+    const feedbackList = document.getElementById("feedbackList");
+
+    if (!feedbackList) return;
+
+    feedbackList.innerHTML = "";
+
+    feedbacks.forEach(item => {
+
+        feedbackList.innerHTML += `
+            <div class="card">
+                <h3>${item.name}</h3>
+                <p>${item.rating}</p>
+                <p>${item.comment}</p>
+                <small>${item.date}</small>
+            </div>
+        `;
+
+    });
+
+}
+
+// Pickup Reminder
+function checkTodayReminder() {
 
     const today = new Date().toISOString().split("T")[0];
 
-    const todayCount = pickups.filter(p => p.date === today).length;
+    const todayPickups = pickups.filter(
+        pickup => pickup.date === today &&
+        pickup.status === "pending"
+    );
 
-    const completedCount = pickups.filter(p => p.status === "completed").length;
+    if (todayPickups.length > 0) {
 
-    const pendingCount = pickups.filter(p => p.status !== "completed").length;
+        alert(
+            "Reminder: You have " +
+            todayPickups.length +
+            " pickup(s) scheduled for today."
+        );
 
-    const totalElement = document.getElementById("totalPickups");
-    const todayElement = document.getElementById("todayPickups");
-    const completedElement = document.getElementById("completedPickups");
-    const pendingElement = document.getElementById("pendingPickups");
+    }
 
-    if (totalElement) totalElement.textContent = total;
-    if (todayElement) todayElement.textContent = todayCount;
-    if (completedElement) completedElement.textContent = completedCount;
-    if (pendingElement) pendingElement.textContent = pendingCount;
 }
+
+// ===============================
+// App Initialization
+// ===============================
 
 displayPickups();
 displayFeedback();
 updateDashboard();
-
-const searchInput = document.getElementById("search");
-
-if (searchInput) {
-    searchInput.addEventListener("keyup", function () {
-        const searchText = this.value.toLowerCase();
-
-        const cards = document.querySelectorAll("#pickupList .card");
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchText) ? "block" : "none";
-        });
-    });
-}
+checkTodayReminder();
