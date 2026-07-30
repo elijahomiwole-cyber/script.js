@@ -15,3 +15,5 @@ function updateDashboard() {
     document.getElementById("completedPickups").textContent = completedCount;
     document.getElementById("pendingPickups").textContent = pendingCount;
 }
+displayPickups();
+displayFeedback();
